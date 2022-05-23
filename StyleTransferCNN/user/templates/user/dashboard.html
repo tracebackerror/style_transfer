@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}<title>Dashboard</title>{% endblock title %}
+
+{% block body %}
+
+<div class="container" style="border: 1px solid lightgrey;padding: 20px;">
+    <div class="row">
+        <div class="col-md-9">
+            <h4 style="font-weight: bold;font-style: italic;">Hii, {{ request.user }}</h4>
+            <br>
+            <a id="setupForgotPass" class="btn btn-info" href="{% url 'setup_forgot_pass' %}" role="button">Setup Forgot Password</a>
+        </div>
+        <div class="col-md-3 text-right">
+            <a class="btn btn-primary" href="{% url 'logout' %}" role="button">Logout</a>
+        </div>
+    </div>
+
+</div>
+
+{% endblock body %}

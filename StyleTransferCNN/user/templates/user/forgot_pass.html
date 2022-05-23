@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}<title>Forgot Password</title>{% endblock title %}
+
+{% block header %}
+<style>
+    .img-selected{
+        border: 5px solid red;
+    }
+</style>
+{% endblock header %}
+
+{% block body %}
+
+{% if setpass %}
+<div class="container col-md-5">
+    <a href="{% url 'login' %}"><i class="fa fa-arrow-circle-left" aria-hidden="true"> Back To Login</i></a>
+</div>
+<br>
+<div class="container col-md-5" style="border: solid 1px lightgray;padding: 30px;">
+    <br>
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="username" value="{{username}}">
+
+        {% if form.errors %}
+            {% for field in form %}
+                {% for error in field.errors %}
+                    <div class="alert alert-danger">
+                        <strong>{{ error|escape }}</strong>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+                <div class="alert alert-danger">
+                    <strong>{{ error|escape }}</strong>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {{form.new_password1}}
+        <span style="color: grey;font-size: small;">
+        <br>
+        Your password can’t be too similar to your other personal information <br>
+        Your password must contain at least 8 characters <br>
+        Your password can’t be a commonly used password <br>
+        Your password can’t be entirely numeric <br>
+        </span>
+        <br>
+
+        {{form.new_password2}}
+        <br><br>
+
+        <button style="width: 150px;display: block;margin-left: auto;margin-right: auto;" type="submit" class="btn btn-outline-success">Reset Password</button>
+    </form>
+    <br>
+</div>
+
+
+{% elif verified %}
+<div class="container">
+    <a href="{% url 'login' %}"><i class="fa fa-arrow-circle-left" aria-hidden="true"> Back To Login</i></a>
+</div>
+<br>
+<div id="divSet1">
+    <div class="container">
+        <h5>Select 1st image</h5>
+    </div>
+    <div class="container text-center" style="border: 1px solid lightgrey;padding-top: 10px;padding-bottom: 10px;">
+        <div class="row">
+            {% for imgsrc in imgset1 %}
+                <div class="col-4" style="padding: 5px;">
+                    <img src="{{imgsrc}}" width="300" height="200" alt="img">
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="container">
+    <br>
+    <button id="btnNext1" style="width: 150px;display: block;margin-left: auto;" type="button" class="btn btn-primary">Next</button>
+    <br><br>
+    </div>
+</div>
+
+<div id="divSet2" style="display: none;">
+    <div class="container">
+        <h5>Select 2nd image</h5>
+    </div>
+    <div class="container text-center" style="border: 1px solid lightgrey;padding-top: 10px;padding-bottom: 10px;">
+        <div class="row">
+            {% for imgsrc in imgset2 %}
+                <div class="col-4" style="padding: 5px;">
+                    <img src="{{imgsrc}}" width="300" height="200" alt="img">
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="container">
+    <br>
+    <button id="btnNext2" style="width: 150px;display: block;margin-left: auto;" type="button" class="btn btn-primary">Next</button>
+    <br><br>
+    </div>
+</div>
+
+
+<div id="divSet3" style="display: none;">
+    <div class="container">
+        <h5>Select 3rd image</h5>
+    </div>
+    <div class="container text-center" style="border: 1px solid lightgrey;padding-top: 10px;padding-bottom: 10px;">
+        <div class="row">
+            {% for imgsrc in imgset3 %}
+                <div class="col-4" style="padding: 5px;">
+                    <img src="{{imgsrc}}" width="300" height="200" alt="img">
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="container">
+    <br>
+    <form method="post" onsubmit="return validateForm();">
+        {% csrf_token %}
+        <input type="hidden" name="imgsrclist" value="">
+        <input type="hidden" name="username" value="">
+        <button style="width: 150px;display: block;margin-left: auto;" type="submit" class="btn btn-primary">Verify</button>
+    </form>
+    <br><br>
+    </div>
+</div>
+
+
+{% else %}
+<div class="container col-md-4">
+    <a href="{% url 'login' %}"><i class="fa fa-arrow-circle-left" aria-hidden="true"> Back To Login</i></a>
+</div>
+<br>
+<div class="container col-md-4" style="border: solid 1px lightgray;padding: 20px;">
+    <br>
+    <form method="get">
+        {% comment %} {% csrf_token %} {% endcomment %}
+
+        {% if form.errors %}
+            {% for field in form %}
+                {% for error in field.errors %}
+                    <div class="alert alert-danger">
+                        <strong>{{ error|escape }}</strong>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+                <div class="alert alert-danger">
+                    <strong>{{ error|escape }}</strong>
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        {% for message in messages %}
+            <div class="alert alert-danger">
+                <strong>{{ message|escape }}</strong>
+            </div>
+        {% endfor %}
+
+        <input type="text" name="username" autofocus="" class="form-control" placeholder="Username" maxlength="150" required="">
+        <br>
+        <button style="width: 150px;display: block;margin-left: auto;margin-right: auto;" type="submit" class="btn btn-outline-success">Submit</button>
+    </form>
+    <br>
+    <br>
+</div>
+{% endif %}
+
+{% endblock body %}
+
+
+{% block script %}
+<script>
+    var imgSrcList = [];
+    $(document).ready(function() {
+        $("img").click(function(){
+            $("img").removeClass("img-selected");
+            $(this).addClass("img-selected");
+        });
+
+        $("#btnNext1").click(function(){
+            let imgSrc = $(".img-selected").attr("src");
+            if (imgSrc){
+                imgSrcList.push(imgSrc);
+                $("img").removeClass("img-selected");
+                $("#divSet1").hide();
+                $("#divSet2").show();
+            }else{
+                alert("Please select a image");
+            }
+        });
+
+        $("#btnNext2").click(function(){
+            let imgSrc = $(".img-selected").attr("src");
+            if (imgSrc){
+                imgSrcList.push(imgSrc);
+                $("img").removeClass("img-selected");
+                $("#divSet2").hide();
+                $("#divSet3").show();
+            }else{
+                alert("Please select a image");
+            }
+        });
+    });
+
+    function validateForm(){
+        let imgSrc = $(".img-selected").attr("src");
+        if (imgSrc){
+            imgSrcList.push(imgSrc);
+            $('input[name=imgsrclist]').val(imgSrcList.join());
+            $('input[name=username]').val("{{request.GET.username}}");
+            return true;
+        }else{
+            alert("Please select a image");
+            return false;
+        }
+    }
+</script>
+{% endblock script %}

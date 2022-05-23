@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}<title>Dashboard</title>{% endblock title %}
+
+
+{% block header %}
+<style>
+    .table td{
+        vertical-align: middle;
+    }
+    .table th{
+        vertical-align: middle;
+    }
+</style>
+<link rel="stylesheet" href="{% static 'css/magnific-popup.css' %}">
+<script src="{% static 'js/jquery.magnific-popup.min.js' %}"></script>
+{% endblock header %}
+
+{% block body %}
+
+<a href="{% url 'dashboard' %}"><i class="fa fa-arrow-circle-left" aria-hidden="true"> Back To Home</i></a>
+<br>
+<br>
+    <table class="table">
+        <tbody>
+            {% for i in range_list %}
+            <tr>
+                <form id="form{{i}}" method="POST" enctype="multipart/form-data" onsubmit="$('#btnLoader{{i}}').show();$('#btnTransform{{i}}').hide();$('button').attr('disabled', 'disabled');">
+                    {% csrf_token %}
+                    <input type="hidden" name="row" value="{{i}}">
+                    <th scope="row">{{i}}</th>
+                    <td>
+                        <div class="form-group">
+                            <label id="cfile"+{{i}}>Select Content File</label>
+                            <input type="file" class="form-control-file" name="content_file" id="cfile"+{{i}} accept="image/png, image/jpeg" required>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-group">
+                            <label id="sfile"+{{i}}>Select Style File</label>
+                            <input type="file" class="form-control-file" name="style_file" id="sfile"+{{i}} accept="image/png, image/jpeg" required>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-group">
+                          <input type="number" style="width: 80%;" class="form-control" name="num_iteration" aria-describedby="helpId" placeholder="Enter number of itertation" min="1" required>
+                          <small id="helpId" class="form-text text-muted">more number of iteration give more better output,<br> but need more RAM (recommanded 10)</small>
+                        </div>
+                    </td>
+                    <td>
+                        <button id="btnTransform{{i}}" type="submit" class="btn btn-success btn-sm">Transform</button>
+                        <button id="btnLoader{{i}}" style="display: none;" class="btn btn-success btn-sm" type="button" disabled>
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Loading...
+                          </button>
+                    </td>
+                    <td>
+                        <div class="preview-gallery">
+                            {% if i == 1 and transformed1 %}
+                                <a href="{{transformed1.url}}">
+                                    <img style="width: 150px;height: 150px;border: 1px solid lightgrey;"
+                                        src="{{transformed1.url}}" alt="Image Preview">
+                                </a>
+                            {% elif i == 2 and transformed2 %}
+                                <a href="{{transformed2.url}}">
+                                    <img style="width: 150px;height: 150px;border: 1px solid lightgrey;"
+                                        src="{{transformed2.url}}" alt="Image Preview">
+                                </a>
+                            {% elif i == 3 and transformed3 %}
+                                <a href="{{transformed3.url}}">
+                                    <img style="width: 150px;height: 150px;border: 1px solid lightgrey;"
+                                        src="{{transformed3.url}}" alt="Image Preview">
+                                </a>
+                            {% else %}
+                                <img style="width: 150px;height: 150px;border: 1px solid lightgrey;"
+                                    src="{% static 'images/image-preview.png' %}" alt="Image Preview">
+                            {% endif %}
+                        </div>
+                    </td>
+                </form>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+
+{% endblock body %}
+
+
+{% block script %}
+<script>
+    $(document).ready(function() {
+        $('.preview-gallery').magnificPopup({
+            type:'image',
+            delegate: 'a',
+            gallery: {
+                enabled: true
+            }
+        });
+    });
+</script>
+{% endblock script %}
